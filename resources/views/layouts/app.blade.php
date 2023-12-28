@@ -57,6 +57,8 @@
                 Reserved.</span>
         </div>
     </footer>
+
+    @stack('script')
 </body>
 
 </html>
