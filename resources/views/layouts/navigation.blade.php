@@ -15,10 +15,10 @@
             </form>
             <div class="hidden sm:ml-6 sm:flex gap-2 sm:items-center">
                 <!-- This Button Should Be Hidden on Mobile Devices -->
-                <button type="button"
+                <a href="{{ route('posts.create') }}"
                     class="text-gray-900 hover:text-white border-2 border-gray-800 hover:bg-gray-900 focus:ring-2 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center hidden md:block">
-                    Create Post
-                </button>
+                    {{ __('Create Post') }}
+                </a>
 
                 <!-- Profile dropdown -->
                 <div class="relative ml-3" x-data="{ open: false }">

@@ -17,7 +17,17 @@ class ProfileController extends Controller
     {
 
         $user = DB::table('users')->find($id);
-        return view('profile.show', ['user'=> $user]);
+        $posts = DB::table('posts')->where('user_id', $id)->get();
+
+        // $user = DB::table('users')
+        // ->join('posts', 'users.id', '=', 'posts.user_id')
+        // ->where('users.id', $id)
+        // ->get();
+
+        // dd($user);
+
+
+        return view('profile.show', compact(['user', 'posts']));
     }
 
     public function edit(string $id):View
