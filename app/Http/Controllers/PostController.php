@@ -115,7 +115,7 @@ class PostController extends Controller
         $post = DB::table('posts')->find($id);
         $auth_user_id = Auth::user()->id;
 
-        if($auth_user_id === $post->user_id){
+        if($auth_user_id !== $post->user_id){
             return redirect()->route('profile.show',$auth_user_id );
         }else{
 
