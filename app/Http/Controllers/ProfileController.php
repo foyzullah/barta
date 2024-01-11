@@ -12,39 +12,62 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    /**
+     * Show the user's profile and user's all post.
+     */
 
-    public function show(string $id):View
-    {
-
+    public function show($id){
         $user = DB::table('users')->find($id);
-        return view('profile.show', ['user'=> $user]);
+        $posts = DB::table('posts')->where('user_id', $id)->get();
+        $comments = DB::table('posts')->join('comments', 'posts.id', 'comments.post_id')->get();
+
+        return view('profile.show', compact('user', 'posts', 'comments'));
     }
 
-    public function edit(string $id):View
+    /**
+     * Display the user's profile form.
+     */
+    public function edit($id): View
     {
-        $user = DB::table('users')->find($id);
-        return view('profile.edit', ['user'=> $user]);
-
+        return view('profile.edit', [
+                'user' => DB::table('users')->find($id),
+            ]);
     }
 
-    public function update(ProfileUpdateRequest $request):RedirectResponse
+    /**
+     * Update the user's profile information.
+     */
+    public function update(ProfileUpdateRequest $request, String $id): RedirectResponse
     {
         $validated = $request->validated();
-        $id = Auth::user()->id;
-        $user = DB::table('users')->where('id', $id)->update([
 
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name']
-        ]);
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
 
-        return redirect()->route('profile.show', auth()->user()->id);
+        DB::table('users')->where('id', $id)->update($validated);
+
+        return redirect()->route('profile.show', $request->user()->id);
     }
 
-    public function destroy(Request $request){
+    /**
+     * Delete the user's account.
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
         Auth::logout();
+
+        $user->delete();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login.create');
+        return Redirect::to('/');
     }
 }

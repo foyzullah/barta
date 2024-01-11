@@ -46,8 +46,9 @@
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
                             tabindex="-1" id="user-menu-item-2">
                             @csrf
-
-                            <button type="submit">{{ __('Sign out') }}</button>
+                            <button type="submit">
+                                {{ __('Sign out') }}
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -89,10 +90,10 @@
                 </div>
             </div>
             <div class="mt-3 space-y-1">
-                <a href="./profile.html"
+                <a href="{{ route('profile.show', auth()->user()->id) }}"
                     class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800">Your
                     Profile</a>
-                <a href="./edit-profile.html"
+                <a href="{{ route('profile.edit', auth()->user()->id) }}"
                     class="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800">Edit
                     Profile</a>
                 <a href="#"
