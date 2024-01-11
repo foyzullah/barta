@@ -35,12 +35,14 @@ class PostController extends Controller
     public function store(PostCreateRequest $request):RedirectResponse
     {
         $validated = $request->validated();
-        $imageName = time() . '.' . $validated['picture']->extension();
-        $validated['picture']->storeAs('public/images', $imageName);
+        if(isset($validated['picture'])){
+            $imageName = time() . '.' . $validated['picture']->extension();
+            $validated['picture']->storeAs('public/images', $imageName);
+        }
 
         DB::table('posts')->insert([
             'description'=>$validated['description'],
-            'image_url'=>$imageName,
+            'picture'=>$imageName?? 'Null',
             'user_id'=>Auth::user()->id
         ]);
         return redirect()->route('profile.show', Auth::user()->id)->with([
@@ -72,7 +74,13 @@ class PostController extends Controller
         ->select('posts.*', 'users.first_name as first_name','users.last_name as last_name' , 'users.email as user_email')
         ->where('posts.id', '=', $id)
         ->first();
-        return view('post.show', compact('post'));
+        $comments = DB::table('comments')
+            ->join('users', 'comments.user_id', '=', 'users.id')
+            ->join('posts', 'comments.post_id', '=', 'posts.id')
+            ->select('comments.*', 'users.first_name as first_name', 'users.last_name as last_name', 'posts.description as description')
+            ->where('comments.post_id', $id)
+            ->get();
+        return view('post.show', compact('post', 'comments'));
     }
 
     /**
@@ -96,15 +104,18 @@ class PostController extends Controller
     public function update(PostUpdateRequest $request, string $id):RedirectResponse
     {
         $validated = $request->validated();
-        $imageName = time() . '.' . $validated['picture']->extension();
-        $validated['picture']->storeAs('public/images', $imageName);
+
+        if(isset($validated['picture'])){
+            $imageName = time() . '.' . $validated['picture']->extension();
+            $validated['picture']->storeAs('public/images', $imageName);
+        }
 
         DB::table('posts')->where('id', $id)->update([
             'description'=> $validated['description'],
-            'image_url'=>$imageName
+            'picture'=> $imageName ?? 'Null'
         ]);
 
-        return redirect()->route('posts.index');
+        return redirect()->route('home');
     }
 
     /**

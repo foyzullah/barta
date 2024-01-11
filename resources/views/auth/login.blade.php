@@ -1,60 +1,55 @@
-@extends('layouts.guest')
-@section('guest_content')
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <a href="./index.html" class="text-center text-6xl font-bold text-gray-900">
-            <h1>Barta</h1>
-        </a>
+<x-guest-layout>
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-
+    <x-slot name="title">
         <h1 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign in to your account
         </h1>
-    </div>
+    </x-slot>
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" action="{{ route('login.store') }}" method="POST">
-            @csrf
-            <div>
-                <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email
-                    address</label>
-                <div class="mt-2">
-                    <input id="email" name="email" type="email" autocomplete="email" placeholder="bruce@wayne.com"
-                        required
-                        class="block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6" />
-                </div>
-                @error('email')
-                    {{ $message }}
-                @enderror
+
+    <form class="space-y-6" method="POST" action="{{ route('login') }}">
+        @csrf
+        <!-- Email Address -->
+        <div>
+
+            <x-input-label for="email" :value="__('Email Address')" />
+            <div class="mt-2">
+                <x-text-input id="email" type="email" name="email" :value="old('email')" required autofocus
+                    autocomplete="username" placeholder="bruce@wayne.com" />
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
+        </div>
 
-            <div>
-                <div class="flex items-center justify-between">
-                    <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
-                    <div class="text-sm">
-                        <a href="#" class="font-semibold text-black hover:text-black">Forgot password?</a>
-                    </div>
+        <!-- Password -->
+        <div class="mt-4">
+            <div class="flex items-center justify-between">
+                <x-input-label for="password" :value="__('Password')" />
+                <div class="text-sm">
+                    <a href="{{ route('password.request') }}"
+                        class="font-semibold text-black hover:text-black">{{ __('Forgot password?') }}</a>
                 </div>
-                <div class="mt-2">
-                    <input id="password" name="password" type="password" autocomplete="current-password"
-                        placeholder="••••••••" required
-                        class="block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6" />
-                </div>
-                @error('password')
-                    {{ $message }}
-                @enderror
             </div>
+            <div class="mt-2">
+                <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required
+                    autocomplete="current-password" placeholder="••••••••" />
 
-            <div>
-                <button type="submit"
-                    class="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
-                    Sign in
-                </button>
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
-        </form>
+        </div>
 
-        <p class="mt-10 text-center text-sm text-gray-500">
-            Don't have an account yet?
-            <a href="{{ route('register.create') }}" class="font-semibold leading-6 text-black hover:text-black">Sign Up</a>
-        </p>
-    </div>
-@endsection
+        <div>
+            <button type="submit"
+                class="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
+                {{ __('Sign in') }}
+            </button>
+        </div>
+    </form>
+
+    <p class="mt-10 text-center text-sm text-gray-500">
+        {{ __("Don't have an account yet?") }}
+        <a href="{{ route('register') }}"
+            class="font-semibold leading-6 text-black hover:text-black">{{ __('Sign Up') }}</a>
+    </p>
+</x-guest-layout>
