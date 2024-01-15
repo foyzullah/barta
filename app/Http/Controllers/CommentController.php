@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -17,7 +18,7 @@ class CommentController extends Controller
         ]);
 
 
-        DB::table('comments')->insert([
+        Comment::create([
             'post_id'=> $id,
             'user_id'=>auth()->user()->id,
             'comment'=>$validated['comment']
@@ -29,7 +30,7 @@ class CommentController extends Controller
 
     public function edit(string $id)
     {
-        $comment = DB::table('comments')->find($id);
+        $comment = Comment::findOrFail($id);
         return view('comment.edit', compact('comment'));
     }
 
@@ -38,12 +39,14 @@ class CommentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validate = $request->validate([
+        $validated = $request->validate([
             'comment'=>'required',
             'post_id'=>'string',
             'user_id'=>'string'
         ]);
-        DB::table('comments')->where('id', $id)->update($validate);
+        $comment = Comment::findOrfail($id);
+        $comment->comment = $validated['comment'];
+        $comment->save();
 
         return Redirect::to(url()->previous());
     }
@@ -53,6 +56,6 @@ class CommentController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('comments')->where('id', $id)->delete();
+        Comment::findOrFail($id)->delete();
     }
 }

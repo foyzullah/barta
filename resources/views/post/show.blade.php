@@ -17,11 +17,11 @@
                         <!-- User Info -->
                         <div class="text-gray-900 flex flex-col min-w-0 flex-1">
                             <a href="profile.html" class="hover:underline font-semibold line-clamp-1">
-                                {{ $post->first_name }}
+                                {{ $post->user->first_name }}
                             </a>
 
                             <a href="profile.html" class="hover:underline text-sm text-gray-500 line-clamp-1">
-                                {{ '@' . strtolower($post->first_name) }}
+                                {{ '@' . strtolower($post->user->first_name) }}
                             </a>
                         </div>
                         <!-- /User Info -->
@@ -44,7 +44,7 @@
             <div class="flex items-center gap-2 text-gray-500 text-xs my-2">
                 <span class="">6 minutes ago</span>
                 <span class="">•</span>
-                <span>3 comments</span>
+                <span>{{ count($post->comments) }} comments</span>
                 <span class="">•</span>
                 <span>450 views</span>
             </div>
@@ -99,10 +99,10 @@
         <!-- /Barta Card -->
 
         <hr />
-        @if (count($comments))
+        @if (count($post->comments))
 
             <div class="flex flex-col space-y-6">
-                <h1 class="text-lg font-semibold">{{ __('Comments') }} ({{ count($comments) }})</h1>
+                <h1 class="text-lg font-semibold">{{ __('Comments') }} ({{ count($post->comments) }})</h1>
 
                 <!-- Barta User Comments Container -->
                 <article
@@ -114,7 +114,7 @@
 
 
                     <!-- Comment  -->
-                    @foreach ($comments as $comment)
+                    @foreach ($post->comments as $comment)
                         <div class="py-4">
                             <!-- Barta User Comments Top -->
                             <header>
@@ -130,12 +130,12 @@
                                         <!-- User Info -->
                                         <div class="text-gray-900 flex flex-col min-w-0 flex-1">
                                             <a href="profile.html" class="hover:underline font-semibold line-clamp-1">
-                                                {{ $comment->first_name }}
+                                                {{ $comment->user->first_name }}
                                             </a>
 
                                             <a href="profile.html"
                                                 class="hover:underline text-sm text-gray-500 line-clamp-1">
-                                                {{ '@' . $comment->first_name }}
+                                                {{ '@' . $comment->user->first_name }}
                                             </a>
                                         </div>
                                         <!-- /User Info -->

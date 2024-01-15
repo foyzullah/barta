@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,11 +19,9 @@ class ProfileController extends Controller
      */
 
     public function show($id){
-        $user = DB::table('users')->find($id);
-        $posts = DB::table('posts')->where('user_id', $id)->get();
-        $comments = DB::table('posts')->join('comments', 'posts.id', 'comments.post_id')->get();
 
-        return view('profile.show', compact('user', 'posts', 'comments'));
+        $user = User::with(['posts', 'comments'])->findOrFail($id);
+        return view('profile.show', compact('user'));
     }
 
     /**
@@ -29,9 +29,9 @@ class ProfileController extends Controller
      */
     public function edit($id): View
     {
-        return view('profile.edit', [
-                'user' => DB::table('users')->find($id),
-            ]);
+
+        $user = User::findOrFail($id);
+        return view('profile.edit', compact('user'));
     }
 
     /**
@@ -39,13 +39,23 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request, String $id): RedirectResponse
     {
-        $validated = $request->validated();
+
+        $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
-        DB::table('users')->where('id', $id)->update($validated);
+        $validated = $request->validated();
+
+        if(isset($validated['picture'])){
+            $imageName = time() . '.'. $validated['picture']->extension();
+            $validated['picture']->storeAs('public/avatars', $imageName);
+        }
+
+        $validated['picture']= $imageName;
+
+        User::where('id', $id)->update($validated);
 
         return redirect()->route('profile.show', $request->user()->id);
     }

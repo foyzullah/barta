@@ -1,6 +1,6 @@
 <x-app-layout>
     <!-- Barta Create Post Card -->
-    @include('components.create_post')
+    @include('components.create_post', ['image' => auth()->user()->picture])
     <!-- /Barta Create Post Card -->
 
     <!-- Newsfeed -->
@@ -15,7 +15,8 @@
                             <!-- User Avatar -->
                             <div class="flex-shrink-0">
                                 <img class="h-10 w-10 rounded-full object-cover"
-                                    src="https://avatars.githubusercontent.com/u/61485238" alt="Al Nahian" />
+                                    src="{{ asset('storage/avatars/' . $post->user->picture) }}"
+                                    alt="{{ $post->user->first_name }}" />
                             </div>
                             <!-- /User Avatar -->
 
@@ -23,12 +24,12 @@
                             <div class="text-gray-900 flex flex-col min-w-0 flex-1">
                                 <a href="{{ route('profile.show', $post->user_id) }}"
                                     class="hover:underline font-semibold line-clamp-1">
-                                    {{ $post->first_name }}
+                                    {{ $post->user->first_name . ' ' . $post->user->last_name }}
                                 </a>
 
                                 <a href="{{ route('profile.show', $post->user_id) }}"
                                     class="hover:underline text-sm text-gray-500 line-clamp-1">
-                                    {{ strtolower('@' . $post->first_name) }}
+                                    {{ strtolower('@' . $post->user->first_name) }}
                                 </a>
                             </div>
                             <!-- /User Info -->
@@ -73,15 +74,8 @@
                                         d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
                                 </svg>
 
-                                <?php
-                                $count = 0;
-                                foreach ($comments as $comment) {
-                                    if ($post->id === $comment->post_id) {
-                                        $count++;
-                                    }
-                                }
-                                ?>
-                                <p>{{ $count }}</p>
+
+                                <p>{{ count($post->comments) }}</p>
                             </a>
                             <!-- /Comment Button -->
                         </div>

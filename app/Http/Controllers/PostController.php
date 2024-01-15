@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\PostUpdateRequest;
-use Illuminate\Database\Query\JoinClause;
+use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -40,10 +39,10 @@ class PostController extends Controller
             $validated['picture']->storeAs('public/images', $imageName);
         }
 
-        DB::table('posts')->insert([
+        Post::create([
             'description'=>$validated['description'],
             'picture'=>$imageName?? 'Null',
-            'user_id'=>Auth::user()->id
+            'user_id'=>$request->user()->id
         ]);
         return redirect()->route('profile.show', Auth::user()->id)->with([
             'message' => 'User added successfully!',
@@ -58,37 +57,16 @@ class PostController extends Controller
      */
     public function show(string $id):View
     {
-        // $auth_user = Auth::user()->id;
-        // $user_id = DB::table('posts')->where('user_id', $auth_user);
-        // if($auth_user !== $user_id){
-
-        // }
-
-
-        // $posts = DB::table('posts')->join('users', function (JoinClause $join) use ($id){
-        //     $join->on('users.id', '=', 'posts.user_id')->where('id', $id);
-        // } )->first();
-
-        $post = DB::table('posts')
-        ->join('users', 'posts.user_id', '=', 'users.id')
-        ->select('posts.*', 'users.first_name as first_name','users.last_name as last_name' , 'users.email as user_email')
-        ->where('posts.id', '=', $id)
-        ->first();
-        $comments = DB::table('comments')
-            ->join('users', 'comments.user_id', '=', 'users.id')
-            ->join('posts', 'comments.post_id', '=', 'posts.id')
-            ->select('comments.*', 'users.first_name as first_name', 'users.last_name as last_name', 'posts.description as description')
-            ->where('comments.post_id', $id)
-            ->get();
-        return view('post.show', compact('post', 'comments'));
+        $post = Post::with(['user', 'comments'])->findOrFail($id);
+        return view('post.show', compact('post'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Post $post)
     {
-        $post = DB::table('posts')->find($id);
+
         $auth_user_id = Auth::user()->id;
         if($auth_user_id !== $post->user_id){
             return redirect()->route('profile.show',$auth_user_id );
@@ -110,10 +88,15 @@ class PostController extends Controller
             $validated['picture']->storeAs('public/images', $imageName);
         }
 
-        DB::table('posts')->where('id', $id)->update([
-            'description'=> $validated['description'],
-            'picture'=> $imageName ?? 'Null'
-        ]);
+        $post = Post::findOrFail($id);
+
+        $post->description = $validated['description'];
+        $post->picture = $imageName ?? 'Null';
+        $post->save();
+
+
+
+
 
         return redirect()->route('home');
     }
@@ -124,13 +107,14 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         $post = DB::table('posts')->find($id);
+        $post = Post::with('comments')->findOrFail($id);
         $auth_user_id = Auth::user()->id;
 
         if($auth_user_id !== $post->user_id){
             return redirect()->route('profile.show',$auth_user_id );
         }else{
 
-            DB::table('posts')->where('id', $id)->delete();
+            $post->delete();
             return redirect()->route('profile.show', $auth_user_id);
         }
 

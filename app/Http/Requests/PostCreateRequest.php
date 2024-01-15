@@ -23,7 +23,7 @@ class PostCreateRequest extends FormRequest
     {
         return [
             'description'=> 'required',
-            'picture'=>['image','mimes:jpg, jpeg, png']
+            'picture'=>['image','mimes:jpg, jpeg, png'],
         ];
     }
 }

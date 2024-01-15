@@ -1,3 +1,4 @@
+@props(['image'])
 <form method="POST" action="{{ route('posts.store') }}" enctype="multipart/form-data"
     class="bg-white border-2 border-black rounded-lg shadow mx-auto max-w-none px-4 py-5 sm:px-6 space-y-3">
     @csrf
@@ -6,7 +7,7 @@
         <div class="flex items-start /space-x-3/">
             <!-- User Avatar -->
             <div class="flex-shrink-0">
-                <img class="h-10 w-10 rounded-full object-cover" src="https://avatars.githubusercontent.com/u/831997"
+                <img class="h-10 w-10 rounded-full object-cover" src="{{ asset('storage/avatars/' . $image) }}"
                     alt="Ahmed Shamim" />
             </div>
             <!-- /User Avatar -->
@@ -55,16 +56,3 @@
     </div>
     <!-- /Create Post Card Bottom -->
 </form>
-
-@push('script')
-    <script>
-        picture.onchange = evt => {
-            preview = document.getElementById('preview');
-            preview.style.display = 'block';
-            const [file] = picture.files
-            if (file) {
-                preview.src = URL.createObjectURL(file)
-            }
-        }
-    </script>
-@endpush

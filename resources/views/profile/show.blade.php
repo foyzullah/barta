@@ -7,15 +7,15 @@
             <!-- Avatar -->
             <div class="relative">
                 <img class="w-32 h-32 rounded-full border-2 border-gray-800"
-                    src="https://avatars.githubusercontent.com/u/831997" alt="Ahmed Shamim" />
+                    src="{{ asset('storage/avatars/' . $user->picture) }}" alt="{{ $user->first_name }}" />
                 <!--            <span class="bottom-2 right-4 absolute w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full"></span>-->
             </div>
             <!-- /Avatar -->
 
             <!-- User Meta -->
             <div>
-                <h1 class="font-bold md:text-2xl">{{ $user->first_name }}</h1>
-                <p class="text-gray-700">Less Talk, More Code 💻</p>
+                <h1 class="font-bold md:text-2xl">{{ $user->first_name . ' ' . $user->last_name }}</h1>
+                <p class="text-gray-700">{{ $user->bio }}</p>
             </div>
             <!-- / User Meta -->
         </div>
@@ -25,14 +25,16 @@
         <div class="flex flex-row gap-16 justify-center text-center items-center">
             <!-- Total Posts Count -->
             <div class="flex flex-col justify-center items-center">
-                <h4 class="sm:text-xl font-bold">3</h4>
-                <p class="text-gray-600">Posts</p>
+                <h4 class="sm:text-xl font-bold">{{ count($user->posts) }}</h4>
+                <p class="text-gray-600">{{ __('Posts') }}</p>
             </div>
 
             <!-- Total Comments Count -->
             <div class="flex flex-col justify-center items-center">
-                <h4 class="sm:text-xl font-bold">14</h4>
-                <p class="text-gray-600">Comments</p>
+                <h4 class="sm:text-xl font-bold">
+                    {{ $user->comments ? count($user->comments) : 0 }}
+                </h4>
+                <p class="text-gray-600">{{ __('Comments') }}</p>
             </div>
         </div>
         <!-- /Profile Stats -->
@@ -55,10 +57,10 @@
     </section>
     <!-- /Cover Container -->
 
-    @include('components.create_post')
+    @include('components.create_post', ['image' => $user->picture])
     <!-- /Barta Create Post Card -->
 
-    @foreach ($posts as $post)
+    @foreach ($user->posts as $post)
         <article class="bg-white border-2 border-black rounded-lg shadow mx-auto max-w-none px-4 py-5 sm:px-6">
             <!-- Barta Card Top -->
             <header>
@@ -67,14 +69,14 @@
                         <!-- User Avatar -->
                         <div class="flex-shrink-0">
                             <img class="h-10 w-10 rounded-full object-cover"
-                                src="https://avatars.githubusercontent.com/u/831997" alt="Tony Stark" />
+                                src="{{ asset('storage/avatars/' . $user->picture) }}" alt="Tony Stark" />
                         </div>
                         <!-- /User Avatar -->
 
                         <!-- User Info -->
                         <div class="text-gray-900 flex flex-col min-w-0 flex-1">
                             <a href="profile.html" class="hover:underline font-semibold line-clamp-1">
-                                {{ $user->first_name }}
+                                {{ $user->first_name . ' ' . $user->last_name }}
                             </a>
 
                             <a href="profile.html" class="hover:underline text-sm text-gray-500 line-clamp-1">
@@ -121,15 +123,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
                             </svg>
-                            <?php
-                            $count = 0;
-                            foreach ($comments as $comment) {
-                                if ($post->id === $comment->post_id) {
-                                    $count++;
-                                }
-                            }
-                            ?>
-                            <p>{{ $count }}</p>
+                            <p>{{ count($post->comments) }}</p>
                         </button>
                         <!-- /Comment Button -->
                     </div>
